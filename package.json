@@ -4,7 +4,7 @@
   "description": "Decode enbyte encoded objects, arrays, strings.",
   "main": "lib/index.js",
   "files": [
-    "lib"
+    "lib/index.js"
   ],
   "keywords": [
   ],
