@@ -38,7 +38,7 @@ var buildDebyte = require('debyte')
 
 buffer = someBuffer()
 buffer[0] = 0xF0 // special byte meaning a 4 byte int
-buffer.writeInt32BE(123456789)
+buffer.writeInt32BE(123456789, 1)
 
 // decode returns a single decoded thing.
 // this looks at bytes starting at index.
