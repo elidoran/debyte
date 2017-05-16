@@ -4,63 +4,120 @@
 [![npm version](https://badge.fury.io/js/debyte.svg)](http://badge.fury.io/js/debyte)
 [![Coverage Status](https://coveralls.io/repos/github/elidoran/debyte/badge.svg?branch=master)](https://coveralls.io/github/elidoran/debyte?branch=master)
 
-Decode enbyte encoded objects, arrays, strings.
+Decode endeo enbyte encoded objects, arrays, strings.
 
 See packages:
 
 1. [endeo](https://www.npmjs.com/package/endeo)
 2. [enbyte](https://www.npmjs.com/package/enbyte)
-3. [debytes](https://www.npmjs.com/package/debytes)
-4. [destring](https://www.npmjs.com/package/destring)
+3. [@endeo/bytes](https://www.npmjs.com/package/@endeo/bytes)
+4. [@endeo/input](https://www.npmjs.com/package/@endeo/input)
+5. [unstring](https://www.npmjs.com/package/unstring)
+6. [@endeo/specials](https://www.npmjs.com/package/@endeo/specials)
 
-NOTE: placeholder
 
 ## Install
 
 ```sh
-npm install debyte --save
+# using the default bytes and input:
+npm install --save debyte @endeo/bytes @endeo/input
+
+# using debyte with custom bytes/input
+npm install --save debyte
 ```
 
 
-## Usage
+## Usage: With Endeo
+
+When using debyte with [endeo](https://www.npmjs.com/package/endeo) it provides the [custom options](#usage-custom) and manages the debyte instance.
+
+So, you only need to learn what's below to customize a debyte or use it directly.
+
+
+## Usage: Direct
+
+Shows **direct use** of debyte. For using debyte in endeo see the [endeo package](https://www.npmjs.com/package/endeo)
+
+```javascript
+// get the builder
+var buildDebyte = require('debyte')
+
+// build one
+var debyte = buildDebyte()
+
+// get a buffer somehow
+var buffer = someEncodedContent()
+
+// wrap an input helper around our buffer
+var input = debyte.input(buffer, 0)
+
+// decode returns a single decoded thing.
+// this looks at bytes starting at its index.
+// if it can determine what it is and read it,
+// then it'll return that value.
+// if it doesn't know, it'll return
+// an object with an `error` message property.
+result = debyte.decode(input)
+
+if (result.error) {
+  // then there was an error decoding the buffer
+} else {
+  // otherwise `result` *is* the decoded value.
+}
+
+// Example with enbyte:
+output = enbyte.output()
+enbyte.string('first string', output)
+enbyte.string('second string', output)
+buffer = output.complete()
+
+input = debyte.input(buffer, 0)
+string1 = debyte.string(input)
+string2 = debyte.string(input)
+```
+
+
+## Usage: Custom
+
+Debyte allows customizing its internals so you can alter byte markers and how it performs tasks such as string replacements and "object spec" retrieval.
+
+By default a debyte instance will:
+
+1. use `@endeo/bytes` for its byte markers
+2. use unsupportive functions in place of an `unstring` instance which will return an error when asked to learn a new unstring string.
+3. use unsupportive function in place of an `@endeo/specials` `Specials` instance which will return an error when asked to retrieve an "object spec".
+
+If you're fine with the default bytes and won't be using `unstring` or special objects then you are all set.
+
+Otherwise, you must provide them via options:
 
 
 ```javascript
-    // get the builder
 var buildDebyte = require('debyte')
 
-  // build one
-  , debyte = buildDebyte({
-    // delimiter between array elements and,
-    // end of child object in a parent object
-    delim: 0xFF // default delim
-  })
+// an example of building one with full support
+var debyte = buildDebyte({
 
-buffer = someBuffer()
-buffer[0] = 0xF0 // special byte meaning a 4 byte int
-buffer.writeInt32BE(123456789, 1)
+  // the default bytes are in their own package.
+  // you could specify your own object.
+  bytes: require('@endeo/bytes'),
 
-// decode returns a single decoded thing.
-// this looks at bytes starting at index.
-// if it can determine what it is and read it,
-// then it'll return that value.
-// if it doesn't know, it'll return null
-num = debyte.decode(buffer, 0)
-// the above `num` is now = 123456789
-// NOTE: by default it uses all "big endian" (BE) functions
+  // a default `unstring` instance.
+  // you could specify a custom `unstring` instance
+  // or an unstring-like object with functions:
+  //  restring(id)
+  //  learn(id, string)
+  // this will learn all the strings it encounters,
+  // probably not the best configuration...
+  unstring: require('unstring')()
 
-input = 'some string to encode'
-byteLength = Buffer.byteLength(string, 'utf8')
-buffer.writeInt32BE(byteLength, 0)
-buffer.write(string, 0, 'utf8')
-string = debyte.decode(buffer, 0)
-// string === input
-
-// example with enbyte
-buffer = enbyte.string(input)
-string = debyte.decode(buffer, 0)
-// string === input
+  // a default empty `specials`.
+  // you could specify your own custom `Specials`
+  // or a specials-like object with function:
+  //  get(id)
+  specials: require('@endeo/specials')()
+})
 ```
 
 
-# [MIT License](LICENSE)
+## [MIT License](LICENSE)
