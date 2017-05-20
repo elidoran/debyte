@@ -11,7 +11,7 @@
   "license": "MIT",
   "scripts": {
     "lint": "coffeelint -f build/coffeelint.json lib",
-    "build": "coffee --bare --compile lib",
+    "build": "coffee --bare --compile --no-header lib",
     "clean": "rm -rf ./lib/*.js",
     "prepublish": "npm run build",
     "postpublish": "npm run clean",
