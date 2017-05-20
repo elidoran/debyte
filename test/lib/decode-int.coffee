@@ -78,10 +78,10 @@ describe 'test debyte ints', ->
 
       it 'should decode ' + test[0] + ' via int', ->
 
-        result = debyte().int Input buffer: test[1]
+        result = debyte().int Input test[1], 0
         assert.equal result, test[0]
 
       it 'should decode ' + test[0] + ' via value', ->
 
-        result = debyte().value Input buffer: test[1]
+        result = debyte().value Input test[1], 0
         assert.equal result, test[0]

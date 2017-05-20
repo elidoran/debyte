@@ -39,5 +39,5 @@ describe 'test debyte floats', ->
 
     do (test) -> it 'should decode ' + test[0], ->
 
-      result = debyte().value Input buffer: test[2]
+      result = debyte().value Input test[2], 0
       assert.equal result, test[1]

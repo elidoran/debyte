@@ -21,48 +21,47 @@ describe 'test debyte', ->
     $debyte = buildDebyte()
     assert.equal $debyte.unstring.restring(1), null
     assert.equal $debyte.unstring.learn(1, 'test')?.error, 'unstring.learn() unavailable'
-    assert.equal $debyte.specials.get(1)?.error, 'specials.get() unavailable'
 
 
   it 'should error for invalid indicator byte', ->
 
-    result = debyte().decode Input buffer: Buffer.from []
+    result = debyte().decode Input Buffer.from([]), 0
     assert result?.error
 
 
   it 'should error for invalid indicator byte', ->
 
-    result = debyte().generic Input buffer: Buffer.from [ B.STRING ]
+    result = debyte().generic Input Buffer.from([ B.STRING ]), 0
     assert result?.error
 
 
   it 'should error for invalid indicator byte', ->
 
-    result = debyte().special Input buffer: Buffer.from [ B.ARRAY ]
+    result = debyte().special Input Buffer.from([ B.ARRAY ]), 0
     assert result?.error
 
 
   it 'should error for invalid indicator byte', ->
 
-    result = debyte().array Input buffer: Buffer.from [ B.STRING ]
+    result = debyte().array Input Buffer.from([ B.STRING ]), 0
     assert result?.error
 
 
   it 'should error for invalid indicator byte', ->
 
-    result = debyte().string Input buffer: Buffer.from [ B.ARRAY ]
+    result = debyte().string Input Buffer.from([ B.ARRAY ]), 0
     assert result?.error
 
 
   it 'should error for invalid indicator byte', ->
 
-    result = debyte().string Input buffer: Buffer.from [ B.ARRAY ]
+    result = debyte().string Input Buffer.from([ B.ARRAY ])
     assert result?.error
 
 
   it 'should error for invalid indicator byte', ->
 
-    result = debyte().value Input buffer: Buffer.from [ 0xDB ]
+    result = debyte().value Input Buffer.from([ 0xDB ])
     assert result?.error
 
 
@@ -82,8 +81,8 @@ describe 'test debyte', ->
 
   it 'should build an Input via custom builder', ->
 
-    $debyte = buildDebyte input: (options) ->
-      custom:true, buffer:options.buffer, index:options.index
+    $debyte = buildDebyte input: (buffer, index, options) ->
+      custom:true, buffer:buffer, index:index
 
     buffer = Buffer.alloc 2
 
@@ -97,99 +96,99 @@ describe 'test debyte', ->
 
   it 'should decode() empty object (top level)', ->
 
-    result = debyte().decode Input buffer: Buffer.from [ B.OBJECT, B.TERMINATOR ]
+    result = debyte().decode Input Buffer.from([ B.OBJECT, B.TERMINATOR ]), 0
     assert.deepEqual result, {}
 
 
   it 'should generic() decode empty object (top level)', ->
 
-    result = debyte().generic Input buffer: Buffer.from [ B.OBJECT, B.TERMINATOR ]
+    result = debyte().generic Input Buffer.from([ B.OBJECT, B.TERMINATOR ]), 0
     assert.deepEqual result, {}
 
 
   it 'should value() decode empty object value', ->
 
-    result = debyte().value Input buffer: Buffer.from [ B.EMPTY_OBJECT ]
+    result = debyte().value Input Buffer.from([ B.EMPTY_OBJECT ]), 0
     assert.deepEqual result, {}
 
 
   it 'should decode() empty array (top level)', ->
 
-    result = debyte().decode Input buffer: Buffer.from [ B.ARRAY, B.TERMINATOR ]
+    result = debyte().decode Input Buffer.from([ B.ARRAY, B.TERMINATOR ]), 0
     assert.deepEqual result, []
 
 
   it 'should array() decode empty array (top level)', ->
 
-    result = debyte().array Input buffer: Buffer.from [ B.ARRAY, B.TERMINATOR ]
+    result = debyte().array Input Buffer.from([ B.ARRAY, B.TERMINATOR ]), 0
     assert.deepEqual result, []
 
 
   it 'should value() decode empty array value', ->
 
-    result = debyte().value Input buffer: Buffer.from [ B.EMPTY_ARRAY ]
+    result = debyte().value Input Buffer.from([ B.EMPTY_ARRAY ]), 0
     assert.deepEqual result, []
 
 
   it 'should decode() empty string (top level)', ->
 
-    result = debyte().decode Input buffer: Buffer.from [ B.STRING, B.TERMINATOR ]
+    result = debyte().decode Input Buffer.from([ B.STRING, B.TERMINATOR ]), 0
     assert.strictEqual result, ''
 
 
   it 'should string() decode empty string (top level)', ->
 
-    result = debyte().string Input buffer: Buffer.from [ B.STRING, B.TERMINATOR ]
+    result = debyte().string Input Buffer.from([ B.STRING, B.TERMINATOR ]), 0
     assert.strictEqual result, ''
 
 
   it 'should string() decode empty string (direct)', ->
 
-    result = debyte().string Input buffer: Buffer.from [ B.EMPTY_STRING ]
+    result = debyte().string Input Buffer.from([ B.EMPTY_STRING ]), 0
     assert.strictEqual result, ''
 
 
   it 'should value() decode empty string value', ->
 
-    result = debyte().value Input buffer: Buffer.from [ B.EMPTY_STRING ]
+    result = debyte().value Input Buffer.from([ B.EMPTY_STRING ]), 0
     assert.strictEqual result, ''
 
 
   it 'should value() decode null value', ->
 
-    result = debyte().value Input buffer: Buffer.from [ B.NULL ]
+    result = debyte().value Input Buffer.from([ B.NULL ]), 0
     assert.strictEqual result, null
 
 
   it 'should value() decode true value', ->
 
-    result = debyte().value Input buffer: Buffer.from [ B.TRUE ]
+    result = debyte().value Input Buffer.from([ B.TRUE ]), 0
     assert.strictEqual result, true
 
 
   it 'should value() decode false value', ->
 
-    result = debyte().value Input buffer: Buffer.from [ B.FALSE ]
+    result = debyte().value Input Buffer.from([ B.FALSE ]), 0
     assert.strictEqual result, false
 
 
   it 'should value() decode binary value', ->
 
-    result = debyte().value Input buffer: Buffer.from [ B.BYTES, 5, 1, 2, 3, 4, 5 ]
+    result = debyte().value Input Buffer.from([ B.BYTES, 5, 1, 2, 3, 4, 5 ]), 0
     assert.deepEqual result, Buffer.from [ 1, 2, 3, 4, 5 ]
 
 
   it 'should decode a generic object', ->
 
-    result = debyte().decode Input buffer: Buffer.from [
+    result = debyte().decode Input Buffer.from([
       B.OBJECT, B.STRING, 1, 97, 101, B.TERMINATOR
-    ]
+    ]), 0
     assert.deepEqual result, { a: -1 }
 
 
   it 'should decode a generic object (multi-level)', ->
 
-    result = debyte().decode Input buffer: Buffer.from [
+    result = debyte().decode Input Buffer.from([
       B.OBJECT
 
       # a: 1
@@ -219,23 +218,23 @@ describe 'test debyte', ->
 
       # all done
       B.TERMINATOR
-    ]
+    ]), 0
     assert.deepEqual result, { a: 1, b: { two: 2 }, c: [ 333, 3333, 333333 ], d: { four: 4, e: { f: 5 } }, g: 6 }
 
 
   it 'should decode an array', ->
 
-    result = debyte().decode Input buffer: Buffer.from [
+    result = debyte().decode Input Buffer.from([
       B.ARRAY, B.STRING, 1, 97, 1, 100, B.TERMINATOR
-    ]
+    ]), 0
     assert.deepEqual result, [ 'a', 1, 100 ]
 
 
   it 'should decode a string', ->
 
-    result = debyte().decode Input buffer: Buffer.from [
+    result = debyte().decode Input Buffer.from([
       B.STRING, 5, 97, 98, 99, 100, 101
-    ]
+    ]), 0
     assert.equal result, 'abcde'
 
 
@@ -243,140 +242,106 @@ describe 'test debyte', ->
 
     inputString = '01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890'
 
-    result = debyte().decode Input buffer: Buffer.concat [
+    result = debyte().decode Input Buffer.concat([
       Buffer.from [
         # string with length 101
         B.STRING, B.P1, 0
       ]
       Buffer.from inputString
-    ]
+    ]), 0
     assert.equal result, inputString
 
+  [ 'special', 'decode' ].forEach (method) ->
 
-  it 'should decode a special object', ->
+    # TODO: add more which use B.DEFAULT bytes
 
-    calledId = null
-    spec =
-      creator: -> a:null
-      array: [
-        { key: 'a', default: 1 }
-      ]
-    $debyte = buildDebyte specials: get: (id) -> calledId = id ; spec
-    result = $debyte.decode Input buffer: Buffer.from [
-      # spec id is 1, key isn't there for specials, then value is 1
-      1, 1, B.TERMINATOR
-    ]
+    it 'should decode a special object via ' + method, ->
 
-    assert.equal calledId, 1
-    assert.deepEqual result, { a: 1 }
+      calledId = null
+      spec =
+        creator: -> a:null
+        array: [
+          { key: 'a', default: 1 }
+        ]
 
+      $debyte = buildDebyte specs: [null, spec]
+      result = $debyte[method] Input Buffer.from([
+        # spec id is 1, key isn't there for specials, then value is 1
+        1, 2, B.TERMINATOR
+      ]), 0
 
-  it 'should decode a special object without shortened indicator', ->
-
-    calledId = null
-    spec =
-      creator: -> a:null
-      array: [
-        { key: 'a', default: 1 }
-      ]
-    $debyte = buildDebyte specials: get: (id) -> calledId = id ; spec
-    result = $debyte.decode Input buffer: Buffer.from [
-      # spec id is 1, key isn't there for specials, then value is 1
-      B.SPECIAL, 1, 1, B.TERMINATOR
-    ]
-
-    assert.equal calledId, 1
-    assert.deepEqual result, { a: 1 }
+      assert.deepEqual result, { a: 2 }
 
 
-  it 'should decode a special object with longer id', ->
+    it 'should decode a special object without shortened indicator via ' + method, ->
 
-    calledId = null
-    spec =
-      creator: -> a:null
-      array: [
-        { key: 'a', default: 1 }
-      ]
-    $debyte = buildDebyte specials: get: (id) -> calledId = id ; spec
-    result = $debyte.decode Input buffer: Buffer.from [
-      # spec id is extended 0=101, key isn't there for specials, then value is 1
-      B.SPECIAL, B.P1, 0, 1, B.TERMINATOR
-    ]
+      calledId = null
+      spec =
+        creator: -> a:null
+        array: [
+          { key: 'a', default: 1 }
+        ]
+      $debyte = buildDebyte specs: [null, spec]
+      result = $debyte[method] Input Buffer.from([
+        # spec id is 1, key isn't there for specials, then value is 1
+        B.SPECIAL, 1, 2, B.TERMINATOR
+      ]), 0
 
-    assert.equal calledId, 101
-    assert.deepEqual result, { a: 1 }
-
-
-  it 'should decode a special object via special()', ->
-
-    calledId = null
-    spec =
-      creator: -> a:null
-      array: [
-        { key: 'a', default: 1 }
-      ]
-    $debyte = buildDebyte specials: get: (id) -> calledId = id ; spec
-    result = $debyte.special Input buffer: Buffer.from [
-      # spec id is 1, key isn't there for specials, then value is 1
-      1, 1, B.TERMINATOR
-    ]
-
-    assert.equal calledId, 1
-    assert.deepEqual result, { a: 1 }
+      assert.deepEqual result, { a: 2 }
 
 
-  it 'should decode a special object via special() without shortened indicator', ->
+    it 'should decode a special object with longer id via ' + method, ->
 
-    calledId = null
-    spec =
-      creator: -> a:null
-      array: [
-        { key: 'a', default: 1 }
-      ]
-    $debyte = buildDebyte specials: get: (id) -> calledId = id ; spec
-    result = $debyte.special Input buffer: Buffer.from [
-      # spec id is 1, key isn't there for specials, then value is 1
-      B.SPECIAL, 1, 1, B.TERMINATOR
-    ]
+      calledId = null
+      spec =
+        creator: -> a:null
+        array: [
+          { key: 'a', default: 1 }
+        ]
+      specsArray = []
+      specsArray[101] = spec
+      $debyte = buildDebyte specs: specsArray
+      result = $debyte[method] Input Buffer.from([
+        # spec id is extended 0=101, key isn't there for specials, then value is 1
+        B.SPECIAL, B.P1, 0, 2, B.TERMINATOR
+      ]), 0
 
-    assert.equal calledId, 1
-    assert.deepEqual result, { a: 1 }
+      assert.deepEqual result, { a: 2 }
 
 
-  it 'should decode a special object with an internal special object', ->
+    it 'should decode a special object with an internal special object via ' + method, ->
 
-    spec1 =
-      creator: -> a:null, b:null
-      array: [
-        { key: 'a', default: 1 }
-        { key: 'b', default: null }
-      ]
+      spec1 =
+        creator: -> a:null, b:null
+        array: [
+          { key: 'a', default: 1 }
+          { key: 'b', default: null }
+        ]
 
-    spec2 =
-      creator: -> c:null
-      array: [
-        { key: 'c', default: 1 }
-      ]
+      spec2 =
+        creator: -> c:null
+        array: [
+          { key: 'c', default: 1 }
+        ]
 
-    $debyte = buildDebyte specials: get: (id) ->
-      if id is 1 then spec1 else if id is 2 then spec2
+      $debyte = buildDebyte specs: [null, spec1, spec2]
 
-    result = $debyte.decode Input buffer: Buffer.from [
-      # spec1 id is 1, key isn't there for specials
-      1
-      # then value for key 'a' is 1
-      1
-      # value for key 'b' is another special object
-      # spec2 id is 2, no key
-      B.SPECIAL, 2
-      # value for key 'c' is 3
-      3
-      # then special object 2 is done
-      # then the outer object is done too
-      B.TERMINATOR
-    ]
+      result = $debyte[method] Input Buffer.from([
+        # spec1 id is 1, key isn't there for specials
+        1
+        # then value for key 'a' is 1
+        2
+        # value for key 'b' is another special object
+        # spec2 id is 2, no key
+        B.SPECIAL, 2
+        # value for key 'c' is 3
+        3
+        # then special object 2 is done
+        # then the outer object is done too
+        B.TERMINATOR
+      ]), 0
 
-    assert.deepEqual result, { a: 1, b: { c: 3 } }
+      assert.deepEqual result, { a: 2, b: { c: 3 } }
 
 
   it 'should decode a generic object with an internal special object', ->
@@ -387,9 +352,9 @@ describe 'test debyte', ->
         { key: 'c', default: null }
       ]
 
-    $debyte = buildDebyte specials: get: (id) -> if id is 1 then spec1
+    $debyte = buildDebyte specs: [null, spec1]
 
-    result = $debyte.decode Input buffer: Buffer.from [
+    result = $debyte.decode Input Buffer.from([
       B.OBJECT
       # a:1
       B.STRING, 1, 97, 1
@@ -399,7 +364,7 @@ describe 'test debyte', ->
       # B.SUB_TERMINATOR
       # then the outer object is done too
       B.TERMINATOR
-    ]
+    ]), 0
 
     assert.deepEqual result, { a: 1, b: { c: 3 } }
 
@@ -408,12 +373,12 @@ describe 'test debyte', ->
 
     $debyte = buildDebyte unstring: restring: (id) -> if id is 1 then 'test'
 
-    result = $debyte.decode Input buffer: Buffer.from [
+    result = $debyte.decode Input Buffer.from([
       B.OBJECT
       B.STRING, B.GET_STRING, 1
       4
       B.TERMINATOR
-    ]
+    ]), 0
 
     assert.deepEqual result, { test: 4 }
 
@@ -426,12 +391,12 @@ describe 'test debyte', ->
       calledId = id
       calledString = string
 
-    result = $debyte.decode Input buffer: Buffer.from [
+    result = $debyte.decode Input Buffer.from([
       B.OBJECT
       B.STRING, B.NEW_STRING, 1, 3, 97, 98, 99
       3
       B.TERMINATOR
-    ]
+    ]), 0
 
     assert.equal calledId, 1
     assert.equal calledString, 'abc'
