@@ -88,91 +88,91 @@ describe 'test debyte', ->
     assert.equal input.index, 1
 
 
-  it 'should decode() empty object (top level)', ->
+  it 'should decode empty object via decode() (top-level)', ->
 
     result = debyte().decode Input Buffer.from([ B.OBJECT, B.TERMINATOR ]), 0
     assert.deepEqual result, {}
 
 
-  it 'should generic() decode empty object (top level)', ->
+  it 'should decode empty object via generic() (top-level)', ->
 
     result = debyte().generic Input Buffer.from([ B.OBJECT, B.TERMINATOR ]), 0
     assert.deepEqual result, {}
 
 
-  it 'should value() decode empty object value', ->
+  it 'should decode empty object via value()', ->
 
     result = debyte().value Input Buffer.from([ B.EMPTY_OBJECT ]), 0
     assert.deepEqual result, {}
 
 
-  it 'should decode() empty array (top level)', ->
+  it 'should decode empty array via decode() (top level)', ->
 
     result = debyte().decode Input Buffer.from([ B.ARRAY, B.TERMINATOR ]), 0
     assert.deepEqual result, []
 
 
-  it 'should array() decode empty array (top level)', ->
+  it 'should decode empty array via array() (top level)', ->
 
     result = debyte().array Input Buffer.from([ B.ARRAY, B.TERMINATOR ]), 0
     assert.deepEqual result, []
 
 
-  it 'should value() decode empty array value', ->
+  it 'should decode empty array via value()', ->
 
     result = debyte().value Input Buffer.from([ B.EMPTY_ARRAY ]), 0
     assert.deepEqual result, []
 
 
-  it 'should decode() empty string (top level)', ->
+  it 'should empty string via decode() (top level)', ->
 
     result = debyte().decode Input Buffer.from([ B.STRING, B.TERMINATOR ]), 0
     assert.strictEqual result, ''
 
 
-  it 'should string() decode empty string (top level)', ->
+  it 'should decode empty string via string() (top level)', ->
 
     result = debyte().string Input Buffer.from([ B.STRING, B.TERMINATOR ]), 0
     assert.strictEqual result, ''
 
 
-  it 'should string() decode empty string (direct)', ->
+  it 'should decode empty string via string()', ->
 
     result = debyte().string Input Buffer.from([ B.EMPTY_STRING ]), 0
     assert.strictEqual result, ''
 
 
-  it 'should value() decode empty string value', ->
+  it 'should decode empty string via value()', ->
 
     result = debyte().value Input Buffer.from([ B.EMPTY_STRING ]), 0
     assert.strictEqual result, ''
 
 
-  it 'should value() decode null value', ->
+  it 'should decode null via value()', ->
 
     result = debyte().value Input Buffer.from([ B.NULL ]), 0
     assert.strictEqual result, null
 
 
-  it 'should value() decode true value', ->
+  it 'should decode true via value()', ->
 
     result = debyte().value Input Buffer.from([ B.TRUE ]), 0
     assert.strictEqual result, true
 
 
-  it 'should value() decode false value', ->
+  it 'should decode false via value()', ->
 
     result = debyte().value Input Buffer.from([ B.FALSE ]), 0
     assert.strictEqual result, false
 
 
-  it 'should value() decode binary value', ->
+  it 'should decode binary via value()', ->
 
     result = debyte().value Input Buffer.from([ B.BYTES, 5, 1, 2, 3, 4, 5 ]), 0
     assert.deepEqual result, Buffer.from [ 1, 2, 3, 4, 5 ]
 
 
-  it 'should decode a generic object', ->
+  it 'should decode a generic object via decode()', ->
 
     result = debyte().decode Input Buffer.from([
       B.OBJECT, B.STRING, 1, 97, 101, B.TERMINATOR
@@ -180,7 +180,7 @@ describe 'test debyte', ->
     assert.deepEqual result, { a: -1 }
 
 
-  it 'should decode a generic object (multi-level)', ->
+  it 'should decode a generic object via decode() (multi-level)', ->
 
     result = debyte().decode Input Buffer.from([
       B.OBJECT
@@ -216,7 +216,7 @@ describe 'test debyte', ->
     assert.deepEqual result, { a: 1, b: { two: 2 }, c: [ 333, 3333, 333333 ], d: { four: 4, e: { f: 5 } }, g: 6 }
 
 
-  it 'should decode an array', ->
+  it 'should decode an array via decode()', ->
 
     result = debyte().decode Input Buffer.from([
       B.ARRAY, B.STRING, 1, 97, 1, 100, B.TERMINATOR
@@ -224,7 +224,7 @@ describe 'test debyte', ->
     assert.deepEqual result, [ 'a', 1, 100 ]
 
 
-  it 'should decode a string', ->
+  it 'should decode a string via decode()', ->
 
     result = debyte().decode Input Buffer.from([
       B.STRING, 5, 97, 98, 99, 100, 101
@@ -232,7 +232,7 @@ describe 'test debyte', ->
     assert.equal result, 'abcde'
 
 
-  it 'should decode a long string', ->
+  it 'should decode a long string via decode()', ->
 
     inputString = '01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890'
 
@@ -379,11 +379,12 @@ describe 'test debyte', ->
 
   it 'should learn an unstring string', ->
 
-    calledId = calledString = null
+    calledId = calledString = calledLength = null
 
-    $debyte = buildDebyte unstring: learn: (id, string) ->
+    $debyte = buildDebyte unstring: learn: (id, string, length) ->
       calledId = id
       calledString = string
+      calledLength = length
 
     result = $debyte.decode Input Buffer.from([
       B.OBJECT
@@ -394,4 +395,5 @@ describe 'test debyte', ->
 
     assert.equal calledId, 1
     assert.equal calledString, 'abc'
+    assert.equal calledLength, 3
     assert.deepEqual result, { abc: 3 }
