@@ -103,7 +103,9 @@ class Debyte
 
       when @B.ARRAY   then @_array input
 
-      when @B.STRING  then @_string input
+      when @B.STRING      then @_string input
+      when @B.GET_STRING  then @_string input.back()
+      when @B.NEW_STRING  then @_string input.back()
 
       when @B.TRUE  then true
 
