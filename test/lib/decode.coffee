@@ -224,12 +224,96 @@ describe 'test debyte', ->
     assert.deepEqual result, [ 'a', 1, 100 ]
 
 
-  it 'should decode a string via decode()', ->
+  it 'should decode a string via decode() (top-level)', ->
 
     result = debyte().decode Input Buffer.from([
+      B.STRING, 5, 97, 98, 99, 100, 101, B.TERMINATOR
+    ]), 0
+    assert.equal result, 'abcde'
+
+  it 'should decode known string via decode() (top-level)', ->
+
+    $debyte = buildDebyte unstring: restring: (id) -> if id is 1 then 'abcde'
+
+    result = $debyte.decode Input Buffer.from([
+      B.STRING, B.GET_STRING, 1, B.TERMINATOR
+    ]), 0
+    assert.equal result, 'abcde'
+
+  it 'should decode new string via decode() (top-level)', ->
+
+    calledId = calledString = calledLength = null
+    $debyte = buildDebyte unstring: learn: (id, string, length) ->
+      calledId = id
+      calledString = string
+      calledLength = length
+
+    result = $debyte.decode Input Buffer.from([
+      B.STRING, B.NEW_STRING, 1, 5, 97, 98, 99, 100, 101, B.TERMINATOR
+    ]), 0
+    assert.equal result, 'abcde'
+    assert.equal calledId, 1
+    assert.equal calledString, 'abcde'
+    assert.equal calledLength, 5
+
+
+  it 'should decode a string via value()', ->
+
+    result = debyte().value Input Buffer.from([
       B.STRING, 5, 97, 98, 99, 100, 101
     ]), 0
     assert.equal result, 'abcde'
+
+  it 'should decode known string via value()', ->
+
+    $debyte = buildDebyte unstring: restring: (id) -> if id is 1 then 'abcde'
+
+    result = $debyte.value Input Buffer.from([
+      B.GET_STRING, 1
+    ]), 0
+    assert.equal result, 'abcde'
+
+  it 'should decode new string via value()', ->
+
+    calledId = calledString = calledLength = null
+    $debyte = buildDebyte unstring: learn: (id, string, length) ->
+      calledId = id
+      calledString = string
+      calledLength = length
+
+    result = $debyte.value Input Buffer.from([
+      B.NEW_STRING, 1, 5, 97, 98, 99, 100, 101
+    ]), 0
+    assert.equal result, 'abcde'
+    assert.equal calledId, 1
+    assert.equal calledString, 'abcde'
+    assert.equal calledLength, 5
+
+
+  it 'should decode known string via value() (prefixed)', ->
+
+    $debyte = buildDebyte unstring: restring: (id) -> if id is 1 then 'abcde'
+
+    result = $debyte.value Input Buffer.from([
+      B.STRING, B.GET_STRING, 1
+    ]), 0
+    assert.equal result, 'abcde'
+
+  it 'should decode new string via value() (prefixed)', ->
+
+    calledId = calledString = calledLength = null
+    $debyte = buildDebyte unstring: learn: (id, string, length) ->
+      calledId = id
+      calledString = string
+      calledLength = length
+
+    result = $debyte.value Input Buffer.from([
+      B.STRING, B.NEW_STRING, 1, 5, 97, 98, 99, 100, 101
+    ]), 0
+    assert.equal result, 'abcde'
+    assert.equal calledId, 1
+    assert.equal calledString, 'abcde'
+    assert.equal calledLength, 5
 
 
   it 'should decode a long string via decode()', ->
@@ -363,7 +447,7 @@ describe 'test debyte', ->
     assert.deepEqual result, { a: 1, b: { c: 3 } }
 
 
-  it 'should restring an unstring string', ->
+  it 'should restring an unstring string via decode() (prefixed)', ->
 
     $debyte = buildDebyte unstring: restring: (id) -> if id is 1 then 'test'
 
@@ -377,7 +461,21 @@ describe 'test debyte', ->
     assert.deepEqual result, { test: 4 }
 
 
-  it 'should learn an unstring string', ->
+  it 'should restring an unstring string', ->
+
+    $debyte = buildDebyte unstring: restring: (id) -> if id is 1 then 'test'
+
+    result = $debyte.decode Input Buffer.from([
+      B.OBJECT
+      B.GET_STRING, 1
+      4
+      B.TERMINATOR
+    ]), 0
+
+    assert.deepEqual result, { test: 4 }
+
+
+  it 'should learn an unstring string (prefixed)', ->
 
     calledId = calledString = calledLength = null
 
@@ -389,6 +487,28 @@ describe 'test debyte', ->
     result = $debyte.decode Input Buffer.from([
       B.OBJECT
       B.STRING, B.NEW_STRING, 1, 3, 97, 98, 99
+      3
+      B.TERMINATOR
+    ]), 0
+
+    assert.equal calledId, 1
+    assert.equal calledString, 'abc'
+    assert.equal calledLength, 3
+    assert.deepEqual result, { abc: 3 }
+
+
+  it 'should learn an unstring string', ->
+
+    calledId = calledString = calledLength = null
+
+    $debyte = buildDebyte unstring: learn: (id, string, length) ->
+      calledId = id
+      calledString = string
+      calledLength = length
+
+    result = $debyte.decode Input Buffer.from([
+      B.OBJECT
+      B.NEW_STRING, 1, 3, 97, 98, 99
       3
       B.TERMINATOR
     ]), 0
