@@ -23,49 +23,43 @@ describe 'test debyte', ->
     assert.equal $debyte.unstring.learn(1, 'test')?.error, 'unstring.learn() unavailable'
 
 
-  it 'should error for invalid indicator byte', ->
+  it 'decode() should error for invalid indicator byte', ->
 
     result = debyte().decode Input Buffer.from([]), 0
     assert result?.error
 
 
-  it 'should error for invalid indicator byte', ->
+  it 'generic() should error for invalid indicator byte', ->
 
     result = debyte().generic Input Buffer.from([ B.STRING ]), 0
     assert result?.error
 
 
-  it 'should error for invalid indicator byte', ->
+  it 'special() should error for invalid indicator byte', ->
 
     result = debyte().special Input Buffer.from([ B.ARRAY ]), 0
     assert result?.error
 
 
-  it 'should error for invalid indicator byte', ->
+  it 'array() should error for invalid indicator byte', ->
 
     result = debyte().array Input Buffer.from([ B.STRING ]), 0
     assert result?.error
 
 
-  it 'should error for invalid indicator byte', ->
+  it 'string() should error for invalid indicator byte', ->
 
     result = debyte().string Input Buffer.from([ B.ARRAY ]), 0
     assert result?.error
 
 
-  it 'should error for invalid indicator byte', ->
-
-    result = debyte().string Input Buffer.from([ B.ARRAY ])
-    assert result?.error
-
-
-  it 'should error for invalid indicator byte', ->
+  it 'value() should error for invalid specifier byte', ->
 
     result = debyte().value Input Buffer.from([ 0xDB ])
     assert result?.error
 
 
-  it 'should error for invalid special id', ->
+  it '_special() should error for invalid special id', ->
 
     result = debyte()._special()
     assert result?.error
