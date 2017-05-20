@@ -279,7 +279,7 @@ class Debyte
         id = @int input
         length = @int input
         string = input.string length
-        @unstring.learn id, string
+        @unstring.learn id, string, length
         return string
 
       # if a top-level string is sent with no content it'll
