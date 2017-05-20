@@ -34,16 +34,17 @@ class Debyte
     # endeo, or whatever constructs this Debyte should provide a way
     # to retrieve an "object spec" based on the ID only *if*
     # they are actually using those (expecting them in the encoded input).
-    @specials = options?.specials ?
-      # use default function which doesn't support it
-      get: -> error: 'specials.get() unavailable'
+    # @specials = options?.specials ?
+    #   # use default function which doesn't support it
+    #   get: -> error: 'specials.get() unavailable'
+    @specs = options?.specs ? []
 
     # input
     # use specified input builder or try the standard implementation
     @Input = options?.input ? require '@endeo/input'
 
 
-  input: (buffer, index) -> @Input {buffer, index}
+  input: (buffer, index) -> @Input buffer, index
 
 
   generic: (input) ->
@@ -174,7 +175,7 @@ class Debyte
     `var array, i, end, keyInfo, n, value`
 
     # get the "object spec" for the `id`
-    spec = @specials.get id
+    spec = @specs[id]
 
     unless spec? then return error: 'unknown special ID', id: id
 
